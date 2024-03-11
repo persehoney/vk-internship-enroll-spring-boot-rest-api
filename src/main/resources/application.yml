@@ -1,0 +1,22 @@
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          userHolder:
+            url: https://jsonplaceholder.typicode.com/users
+          postHolder:
+            url: https://jsonplaceholder.typicode.com/posts
+          albumHolder:
+            url: https://jsonplaceholder.typicode.com/albums
+  datasource:
+    url: jdbc:mariadb://localhost:3306/vk_intern
+    username: admin
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update
+  main:
+    allow-circular-references: true
+server:
+  port: 8080
