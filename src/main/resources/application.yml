@@ -13,10 +13,14 @@ spring:
     url: jdbc:mariadb://localhost:3306/vk_intern
     username: admin
     password: admin
+  main:
+    allow-circular-references: true
   jpa:
     hibernate:
       ddl-auto: update
-  main:
-    allow-circular-references: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+
 server:
   port: 8080
