@@ -1,5 +1,5 @@
 # Stage 1: Build stage
-FROM maven:3.8.4-openjdk-17-slim AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 # Copy Maven files for dependency resolution
 COPY pom.xml ./
@@ -12,7 +12,7 @@ COPY src src
 RUN mvn clean install -DskipTests
 
 # Stage 2: Run stage
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:21
 
 # Set working directory
 WORKDIR vk-internship-enroll-spring-boot-rest-api
