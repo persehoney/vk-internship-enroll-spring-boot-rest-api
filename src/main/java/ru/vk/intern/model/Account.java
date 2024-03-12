@@ -20,8 +20,7 @@ import java.util.Set;
 
 @Entity
 @Table(
-        indexes = {@Index(columnList = "creationTime"),
-                @Index(columnList = "login", unique = true)}
+        indexes = {@Index(columnList = "login", unique = true)}
 )
 public class Account {
     @Id
@@ -41,9 +40,6 @@ public class Account {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Size(max = 100)
     private String passwordSha;
-
-    @CreationTimestamp
-    private Date creationTime;
 
     public long getId() {
         return id;
@@ -67,14 +63,6 @@ public class Account {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    public Date getCreationTime() {
-        return creationTime;
-    }
-
-    public void setCreationTime(Date creationTime) {
-        this.creationTime = creationTime;
     }
 
     public void addRole(Role role) {

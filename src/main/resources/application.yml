@@ -10,9 +10,9 @@ spring:
           albumHolder:
             url: https://jsonplaceholder.typicode.com/albums
   datasource:
-    url: jdbc:mariadb://${REST_API_DB_IP:localhost}:${REST_API_DB_PORT:3306}/vk_intern
-    username: admin
-    password: admin
+    url: jdbc:mysql://sql11.freesqldatabase.com:3306/sql11690866
+    username: sql11690866
+    password: WCYCb7Usi3
   main:
     allow-circular-references: true
   jpa:
@@ -20,7 +20,7 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MariaDBDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
 
 server:
   port: 8080

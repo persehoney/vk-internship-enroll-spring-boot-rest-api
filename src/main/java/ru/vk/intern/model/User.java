@@ -14,8 +14,7 @@ import java.util.Date;
 
 @Entity
 @Table(
-        indexes = {@Index(columnList = "creationTime"),
-                @Index(columnList = "username", unique = true)}
+        indexes = {@Index(columnList = "username", unique = true)}
 )
 public class User {
     @Id
@@ -41,9 +40,6 @@ public class User {
     @NotEmpty
     @Size(min = 1, max = 255)
     private String website;
-
-    @CreationTimestamp
-    private Date creationTime;
 
     public long getId() {
         return id;
@@ -91,13 +87,5 @@ public class User {
 
     public void setWebsite(String website) {
         this.website = website;
-    }
-
-    public Date getCreationTime() {
-        return creationTime;
-    }
-
-    public void setCreationTime(Date creationTime) {
-        this.creationTime = creationTime;
     }
 }

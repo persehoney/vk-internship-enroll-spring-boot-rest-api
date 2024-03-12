@@ -8,14 +8,17 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.util.Date;
 
 @Entity
-@Table(indexes = @Index(columnList = "creationTime"))
+@Table
 public class Album {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,9 +31,6 @@ public class Album {
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
     private User user;
-
-    @CreationTimestamp
-    private Date creationTime;
 
     public long getId() {
         return id;
@@ -54,13 +54,5 @@ public class Album {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Date getCreationTime() {
-        return creationTime;
-    }
-
-    public void setCreationTime(Date creationTime) {
-        this.creationTime = creationTime;
     }
 }

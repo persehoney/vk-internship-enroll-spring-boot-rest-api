@@ -15,12 +15,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.util.Date;
 
 @Entity
-@Table(indexes = @Index(columnList = "creationTime"))
+@Table
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "post_seq")
-//    @SequenceGenerator(name = "post_seq", initialValue = 101, allocationSize = 1)
     private long id;
 
     @NotEmpty
@@ -34,9 +32,6 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
     private User user;
-
-    @CreationTimestamp
-    private Date creationTime;
 
     public long getId() {
         return id;
@@ -68,13 +63,5 @@ public class Post {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Date getCreationTime() {
-        return creationTime;
-    }
-
-    public void setCreationTime(Date creationTime) {
-        this.creationTime = creationTime;
     }
 }
