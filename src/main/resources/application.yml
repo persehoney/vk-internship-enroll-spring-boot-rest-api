@@ -10,7 +10,7 @@ spring:
           albumHolder:
             url: https://jsonplaceholder.typicode.com/albums
   datasource:
-    url: jdbc:mariadb://host.docker.internal:3306/vk_intern
+    url: jdbc:mariadb://${REST_API_DB_IP:localhost}:${REST_API_DB_PORT:3306}/vk_intern
     username: admin
     password: admin
   main:
