@@ -41,7 +41,8 @@ public class SecurityInterceptor implements HandlerInterceptor {
             HasRole hasRole = method.getAnnotation(HasRole.class);
             if (hasRole != null) {
                 if (account == null) {
-                    return hasRole.value().length == 0;
+                    response.sendError(HttpStatus.FORBIDDEN.value(), "Log in to get access");
+                    return false;
                 }
 
                 for (Role.Name name : hasRole.value()) {

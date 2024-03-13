@@ -22,7 +22,7 @@ public class AccountCredentialsRegisterValidator implements Validator {
         if (!errors.hasErrors()) {
             AccountCredentials accountCredentials = (AccountCredentials) target;
             if (!accountService.isLoginVacant(accountCredentials.getLogin())) {
-                errors.rejectValue("login.is-in-use", "Login is in use already");
+                errors.reject("login.is-in-use", "Login is in use already");
             }
         }
     }
