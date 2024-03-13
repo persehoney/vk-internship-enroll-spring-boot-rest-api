@@ -35,8 +35,8 @@ class AlbumHandlersTests extends Tests {
 
         login(session, credentials);
 
+        getOk("/albums/28", session);
         getOk("/albums/", session);
-        getOk("/albums/9", session);
     }
 
     @Test

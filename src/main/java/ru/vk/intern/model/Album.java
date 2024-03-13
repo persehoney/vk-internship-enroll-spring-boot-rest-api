@@ -29,7 +29,7 @@ public class Album {
     private String title;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "userId")
     private User user;
 
     public long getId() {

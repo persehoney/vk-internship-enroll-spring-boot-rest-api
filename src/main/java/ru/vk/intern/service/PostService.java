@@ -21,16 +21,26 @@ public class PostService {
 
     public List<Post> findAll() {
         List<Post> posts = postRepository.findAllByOrderById();
-        return !posts.isEmpty() ? posts : postHolder.findAll(); // todo
+        List<Post> holderPosts = postHolder.findAll();
+
+        for (Post post : holderPosts) {
+            if (tryAddToDB(post)) {
+                posts.add(post);
+            }
+        }
+
+        return posts;
     }
 
     public Post findById(long id) {
-        Optional<Post> post = postRepository.findById(id);
-        if (post.isPresent()) {
-            return post.get();
+        Optional<Post> possiblePost = postRepository.findById(id);
+        if (possiblePost.isPresent()) {
+            return possiblePost.get();
         }
         try {
-            return postHolder.findById(id);
+            Post post = postHolder.findById(id);
+            tryAddToDB(post);
+            return post;
         } catch (RuntimeException e) {
             return null;
         }
@@ -58,5 +68,13 @@ public class PostService {
         }
         delete(id);
         return add(newPost);
+    }
+
+    private boolean tryAddToDB(Post post) {
+        if (!postRepository.existsByTitle(post.getTitle())) {
+            postRepository.save(post);
+            return true;
+        }
+        return false;
     }
 }

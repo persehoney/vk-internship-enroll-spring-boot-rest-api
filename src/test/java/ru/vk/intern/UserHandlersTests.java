@@ -33,7 +33,7 @@ class UserHandlersTests extends Tests {
 
         login(session, credentials);
 
-        getOk("/users", session);
+        getOk("/users/3", session);
         getOk("/users/9", session);
     }
 

@@ -32,16 +32,26 @@ public class UserService {
 
     public List<User> findAll() {
         List<User> users = userRepository.findAllByOrderById();
-        return !users.isEmpty() ? users : userHolder.findAll(); // todo
+        List<User> holderUsers = userHolder.findAll();
+
+        for (User user : holderUsers) {
+            if (tryAddToDB(user)) {
+                users.add(user);
+            }
+        }
+
+        return users;
     }
 
     public User findById(long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return user.get();
+        Optional<User> possibleUser = userRepository.findById(id);
+        if (possibleUser.isPresent()) {
+            return possibleUser.get();
         }
         try {
-            return userHolder.findById(id);
+            User user = userHolder.findById(id);
+            tryAddToDB(user);
+            return user;
         } catch (RuntimeException e) {
             return null;
         }
@@ -89,5 +99,13 @@ public class UserService {
         userRepository.save(user);
         userRepository.updatePasswordSha(user.getId(), userCredentials.getUsername(), userCredentials.getPassword());
         return user;
+    }
+
+    private boolean tryAddToDB(User user) {
+        if (!userRepository.existsByUsername(user.getUsername())) {
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 }

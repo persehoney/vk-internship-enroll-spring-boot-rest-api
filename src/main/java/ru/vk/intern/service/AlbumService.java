@@ -21,16 +21,26 @@ public class AlbumService {
 
     public List<Album> findAll() {
         List<Album> albums = albumRepository.findAllByOrderById();
-        return !albums.isEmpty() ? albums : albumHolder.findAll(); // todo
+        List<Album> holderAlbums = albumHolder.findAll();
+
+        for (Album album : holderAlbums) {
+            if (tryAddToDB(album)) {
+                albums.add(album);
+            }
+        }
+
+        return albums;
     }
 
     public Album findById(long id) {
-        Optional<Album> album = albumRepository.findById(id);
-        if (album.isPresent()) {
-            return album.get();
+        Optional<Album> possibleAlbum = albumRepository.findById(id);
+        if (possibleAlbum.isPresent()) {
+            return possibleAlbum.get();
         }
         try {
-            return albumHolder.findById(id);
+            Album album = albumHolder.findById(id);
+            tryAddToDB(album);
+            return album;
         } catch (RuntimeException e) {
             return null;
         }
@@ -58,5 +68,13 @@ public class AlbumService {
         }
         delete(id);
         return add(newAlbum);
+    }
+
+    private boolean tryAddToDB(Album album) {
+        if (!albumRepository.existsByTitle(album.getTitle())) {
+            albumRepository.save(album);
+            return true;
+        }
+        return false;
     }
 }

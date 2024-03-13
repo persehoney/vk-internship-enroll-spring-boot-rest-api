@@ -35,7 +35,7 @@ class PostHandlersTests extends Tests {
 
         login(session, credentials);
 
-        getOk("/posts/", session);
+        getOk("/posts/37", session);
         getOk("/posts/9", session);
     }
 
