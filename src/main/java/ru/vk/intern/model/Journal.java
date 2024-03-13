@@ -9,6 +9,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 @Entity
 @Table
@@ -26,6 +31,12 @@ public class Journal {
     @NotEmpty
     @Size(min = 1, max = 100)
     private String method;
+
+    @Size(min = 1, max = 1000)
+    private String request;
+
+    @CreationTimestamp
+    private Timestamp creationTime;
 
     public long getId() {
         return id;
@@ -57,5 +68,21 @@ public class Journal {
 
     public void setMethod(String method) {
         this.method = method;
+    }
+
+    public String getRequest() {
+        return request;
+    }
+
+    public void setRequest(String request) {
+        this.request = request;
+    }
+
+    public Timestamp getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Timestamp creationTime) {
+        this.creationTime = creationTime;
     }
 }

@@ -31,6 +31,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
         Journal journal = new Journal();
         journal.setMethod(request.getMethod());
+        journal.setRequest(request.getRequestURI());
         if (handler instanceof HandlerMethod handlerMethod) {
             Method method = handlerMethod.getMethod();
 
