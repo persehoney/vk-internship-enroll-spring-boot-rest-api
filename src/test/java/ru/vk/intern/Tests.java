@@ -7,6 +7,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -71,5 +75,10 @@ public class Tests {
                         .contentType(APPLICATION_JSON)
                         .session(session))
                 .andExpect(status().isOk());
+    }
+
+    public String getId(MvcResult result) {
+        return Arrays.stream(Objects.requireNonNull(result.getResponse().getHeader("Location"))
+                .split("/")).toList().getLast();
     }
 }

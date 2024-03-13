@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,15 +37,19 @@ public class AlbumController extends Controller {
 
     @GetMapping("/{id}")
     @HasRole({Role.Name.ROLE_ALBUMS, Role.Name.ROLE_ADMIN})
-    public Album findAlbumById(@PathVariable("id") long id) {
-        return albumService.findById(id);
+    public ResponseEntity<Album> findAlbumById(@PathVariable("id") long id) {
+        Album album = albumService.findById(id);
+        if (album == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(album);
     }
 
     @PostMapping("/")
     @HasRole({Role.Name.ROLE_ALBUMS, Role.Name.ROLE_ADMIN})
     public ResponseEntity<String> addAlbum(@RequestBody Album album, HttpSession httpSession) {
         album.setUser(getUser(httpSession));
-        Album createdAlbum = albumService.addAlbum(album);
+        Album createdAlbum = albumService.add(album);
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/albums/{id}")
                 .buildAndExpand(createdAlbum.getId()).toUri();
@@ -60,5 +65,16 @@ public class AlbumController extends Controller {
         }
 
         return ResponseEntity.ok("Album deleted successfully");
+    }
+
+    @PutMapping("/{id}")
+    @HasRole({Role.Name.ROLE_ALBUMS, Role.Name.ROLE_ADMIN})
+    public ResponseEntity<String> put(@PathVariable("id") long id, @RequestBody Album album, HttpSession httpSession) {
+        album.setUser(getUser(httpSession));
+        Album updatedAlbum = albumService.put(id, album);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/albums/{id}")
+                .buildAndExpand(updatedAlbum.getId()).toUri();
+        return ResponseEntity.created(location).body("Album updated successfully");
     }
 }

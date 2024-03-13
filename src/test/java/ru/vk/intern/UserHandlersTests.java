@@ -8,13 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,8 +79,7 @@ class UserHandlersTests extends Tests {
                 .andExpect(content().string("User created successfully"))
                 .andReturn();
 
-        String id = Arrays.stream(Objects.requireNonNull(result.getResponse().getHeader("Location"))
-                .split("/")).toList().getLast();
+        String id = getId(result);
 
         mockMvc.perform(delete(BASE_URL + "/users/" + id)
                         .contentType(APPLICATION_JSON)
@@ -95,5 +92,55 @@ class UserHandlersTests extends Tests {
                         .session(session))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string("No such user"));
+    }
+
+    @Test
+    @DisplayName("Put handler")
+    void testPutHandler() throws Exception {
+        login(session, credentials);
+
+        String jsonUser = String.format(USER_TEMPLATE, lorem.getName(), RandomString.make(15), lorem.getEmail(),
+                "Super street", "Apt. 69", lorem.getCity(), lorem.getZipCode(), "-3.3", "66.6666", lorem.getPhone(), "meow.org", "X",
+                lorem.getWords(3, 6), "social media");
+
+        MvcResult result =  mockMvc.perform(post(BASE_URL + "/users/")
+                        .contentType(APPLICATION_JSON)
+                        .session(session)
+                        .content(jsonUser))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("User created successfully"))
+                .andReturn();
+
+        String oldId = getId(result);
+
+        String jsonNewUser = String.format(USER_TEMPLATE, lorem.getName(), RandomString.make(15), lorem.getEmail(),
+                "Super street", "Apt. 69", lorem.getCity(), lorem.getZipCode(), "-3.3", "66.6666", lorem.getPhone(), "meow.org", "X",
+                lorem.getWords(3, 6), "social media");
+
+        result = mockMvc.perform(put(BASE_URL + "/users/" + oldId)
+                        .contentType(APPLICATION_JSON)
+                        .session(session)
+                        .content(jsonNewUser))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("User updated successfully"))
+                .andReturn();
+
+        String newId = getId(result);
+
+        mockMvc.perform(get(BASE_URL + "/users/" + oldId)
+                        .contentType(APPLICATION_JSON)
+                        .session(session))
+                .andExpect(status().isNotFound());
+
+        jsonNewUser = String.format(USER_TEMPLATE, lorem.getName(), "admin", lorem.getEmail(),
+                "Super street", "Apt. 69", lorem.getCity(), lorem.getZipCode(), "-3.3", "66.6666", lorem.getPhone(), "meow.org", "X",
+                lorem.getWords(3, 6), "social media");
+
+        mockMvc.perform(put(BASE_URL + "/users/" + newId)
+                        .contentType(APPLICATION_JSON)
+                        .session(session)
+                        .content(jsonNewUser))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Cannot update: new username is already in use"));
     }
 }

@@ -14,6 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,5 +81,38 @@ class PostHandlersTests extends Tests {
                         .session(session))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string("No such post"));
+    }
+
+    @Test
+    @DisplayName("Put handler")
+    void testPutHandler() throws Exception {
+        login(session, credentials);
+
+        String jsonPost = String.format(POST_TEMPLATE, lorem.getTitle(3, 10), lorem.getWords(100, 150));
+
+        MvcResult result =  mockMvc.perform(post(BASE_URL + "/posts/")
+                        .contentType(APPLICATION_JSON)
+                        .session(session)
+                        .content(jsonPost))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("Post created successfully"))
+                .andReturn();
+
+        String oldId = getId(result);
+
+        String jsonNewPost = String.format(POST_TEMPLATE, lorem.getTitle(3, 10), lorem.getWords(100, 150));
+
+        mockMvc.perform(put(BASE_URL + "/posts/" + oldId)
+                        .contentType(APPLICATION_JSON)
+                        .session(session)
+                        .content(jsonNewPost))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("Post updated successfully"))
+                .andReturn();
+
+        mockMvc.perform(get(BASE_URL + "/posts/" + 865754)
+                        .contentType(APPLICATION_JSON)
+                        .session(session))
+                .andExpect(status().isNotFound());
     }
 }

@@ -65,6 +65,15 @@ public class UserService {
         return user;
     }
 
+    public User put(long id, User newUser) {
+        User oldUser = findById(id);
+        if (oldUser == null) {
+            return addUser(newUser);
+        }
+        delete(id);
+        return addUser(newUser);
+    }
+
     public User findByUsernameAndPassword(String username, String password) {
         return username == null || password == null ? null : userRepository.findByUsernameAndPassword(username, password);
     }

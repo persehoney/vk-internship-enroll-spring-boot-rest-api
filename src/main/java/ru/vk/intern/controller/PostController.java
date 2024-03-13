@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,15 +37,19 @@ public class PostController extends Controller {
 
     @GetMapping("/{id}")
     @HasRole({Role.Name.ROLE_POSTS, Role.Name.ROLE_ADMIN})
-    public Post findPostById(@PathVariable("id") long id) {
-        return postService.findById(id);
+    public ResponseEntity<Post> findPostById(@PathVariable("id") long id) {
+        Post post = postService.findById(id);
+        if (post == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(post);
     }
 
     @PostMapping("/")
     @HasRole({Role.Name.ROLE_POSTS, Role.Name.ROLE_ADMIN})
     public ResponseEntity<String> addPost(@RequestBody Post post, HttpSession httpSession) {
         post.setUser(getUser(httpSession));
-        Post createdPost = postService.addPost(post);
+        Post createdPost = postService.add(post);
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/posts/{id}")
                 .buildAndExpand(createdPost.getId()).toUri();
@@ -60,5 +65,16 @@ public class PostController extends Controller {
         }
 
         return ResponseEntity.ok("Post deleted successfully");
+    }
+
+    @PutMapping("/{id}")
+    @HasRole({Role.Name.ROLE_POSTS, Role.Name.ROLE_ADMIN})
+    public ResponseEntity<String> put(@PathVariable("id") long id, @RequestBody Post post, HttpSession httpSession) {
+        post.setUser(getUser(httpSession));
+        Post updatedPost = postService.put(id, post);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/posts/{id}")
+                .buildAndExpand(updatedPost.getId()).toUri();
+        return ResponseEntity.created(location).body("Post updated successfully");
     }
 }

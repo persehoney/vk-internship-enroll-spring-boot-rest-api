@@ -36,7 +36,7 @@ public class AlbumService {
         }
     }
 
-    public Album addAlbum(Album album) {
+    public Album add(Album album) {
         albumHolder.addAlbum(album);
         return albumRepository.save(album);
     }
@@ -49,5 +49,14 @@ public class AlbumService {
         albumHolder.deleteAlbum(id);
         albumRepository.delete(album);
         return album;
+    }
+
+    public Album put(long id, Album newAlbum) {
+        Album oldAlbum = findById(id);
+        if (oldAlbum == null) {
+            return add(newAlbum);
+        }
+        delete(id);
+        return add(newAlbum);
     }
 }

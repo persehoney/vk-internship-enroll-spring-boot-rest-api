@@ -36,7 +36,7 @@ public class PostService {
         }
     }
 
-    public Post addPost(Post post) {
+    public Post add(Post post) {
         postHolder.addPost(post);
         return postRepository.save(post);
     }
@@ -49,5 +49,14 @@ public class PostService {
         postHolder.deletePost(id);
         postRepository.delete(post);
         return post;
+    }
+
+    public Post put(long id, Post newPost) {
+        Post oldPost = findById(id);
+        if (oldPost == null) {
+            return add(newPost);
+        }
+        delete(id);
+        return add(newPost);
     }
 }

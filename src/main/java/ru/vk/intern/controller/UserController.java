@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,8 +36,12 @@ public class UserController {
 
     @GetMapping("/{id}")
     @HasRole({Role.Name.ROLE_USERS, Role.Name.ROLE_ADMIN})
-    public User findUserById(@PathVariable("id") long id) {
-        return userService.findById(id);
+    public ResponseEntity<User> findUserById(@PathVariable("id") long id) {
+        User user = userService.findById(id);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/")
@@ -61,5 +66,18 @@ public class UserController {
         }
 
         return ResponseEntity.ok("User deleted successfully");
+    }
+
+    @PutMapping("/{id}")
+    @HasRole({Role.Name.ROLE_USERS, Role.Name.ROLE_ADMIN})
+    public ResponseEntity<String> put(@PathVariable("id") long id, @RequestBody User user) {
+        User updatedUser = userService.put(id, user);
+        if (updatedUser == null) {
+            return ResponseEntity.badRequest().body("Cannot update: new username is already in use");
+        }
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/{id}")
+                .buildAndExpand(updatedUser.getId()).toUri();
+        return ResponseEntity.created(location).body("User updated successfully");
     }
 }

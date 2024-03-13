@@ -14,6 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,5 +81,38 @@ class AlbumHandlersTests extends Tests {
                         .session(session))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string("No such album"));
+    }
+
+    @Test
+    @DisplayName("Put handler")
+    void testPutHandler() throws Exception {
+        login(session, credentials);
+
+        String jsonAlbum = String.format(ALBUM_TEMPLATE, lorem.getTitle(3, 10));
+
+        MvcResult result = mockMvc.perform(post(BASE_URL + "/albums/")
+                        .contentType(APPLICATION_JSON)
+                        .session(session)
+                        .content(jsonAlbum))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("Album created successfully"))
+                .andReturn();
+
+        String oldId = getId(result);
+
+        String jsonNewAlbum = String.format(ALBUM_TEMPLATE, lorem.getTitle(3, 10));
+
+        mockMvc.perform(put(BASE_URL + "/albums/" + oldId)
+                        .contentType(APPLICATION_JSON)
+                        .session(session)
+                        .content(jsonNewAlbum))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("Album updated successfully"))
+                .andReturn();
+
+        mockMvc.perform(get(BASE_URL + "/albums/" + 865754)
+                        .contentType(APPLICATION_JSON)
+                        .session(session))
+                .andExpect(status().isNotFound());
     }
 }
