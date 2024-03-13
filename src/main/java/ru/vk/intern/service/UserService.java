@@ -28,4 +28,9 @@ public class UserService {
         Optional<User> user = userRepository.findById(id);
         return user.orElseGet(() -> userHolder.findById(id));
     }
+
+    public boolean addUser(User user) {
+        User newUser = userHolder.addUser(user);
+        return true;
+    }
 }

@@ -2,6 +2,8 @@ package ru.vk.intern.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vk.intern.model.Role;
@@ -30,5 +32,11 @@ public class UserController {
     @HasRole({Role.Name.ROLE_USERS, Role.Name.ROLE_ADMIN})
     public User findUserById(@PathVariable("id") long id) {
         return userService.findById(id);
+    }
+
+    @PostMapping("/")
+    @HasRole({Role.Name.ROLE_USERS, Role.Name.ROLE_ADMIN})
+    public boolean addUser(@RequestBody User user) {
+        return userService.addUser(user);
     }
 }
