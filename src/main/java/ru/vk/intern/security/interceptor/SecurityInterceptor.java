@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import ru.vk.intern.controller.Controller;
-import ru.vk.intern.model.Account;
+import ru.vk.intern.model.User;
 import ru.vk.intern.model.Role;
 import ru.vk.intern.security.Guest;
 import ru.vk.intern.security.HasRole;
@@ -28,10 +28,10 @@ public class SecurityInterceptor implements HandlerInterceptor {
         if (handler instanceof HandlerMethod handlerMethod) {
             Method method = handlerMethod.getMethod();
 
-            Account account = controller.getAccount(request.getSession());
+            User user = controller.getUser(request.getSession());
 
             if (method.getAnnotation(Guest.class) != null) {
-                if (account == null) {
+                if (user == null) {
                     return true;
                 }
                 response.sendError(HttpStatus.FORBIDDEN.value(), "You are already logged in");
@@ -40,13 +40,13 @@ public class SecurityInterceptor implements HandlerInterceptor {
 
             HasRole hasRole = method.getAnnotation(HasRole.class);
             if (hasRole != null) {
-                if (account == null) {
+                if (user == null) {
                     response.sendError(HttpStatus.FORBIDDEN.value(), "Log in to get access");
                     return false;
                 }
 
                 for (Role.Name name : hasRole.value()) {
-                    for (Role role : account.getRoles()) {
+                    for (Role role : user.getRoles()) {
                         if (role.getName().equals(name)) {
                             return true;
                         }

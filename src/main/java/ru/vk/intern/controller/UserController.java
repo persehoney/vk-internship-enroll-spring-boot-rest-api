@@ -1,16 +1,21 @@
 package ru.vk.intern.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.vk.intern.model.Role;
 import ru.vk.intern.model.User;
 import ru.vk.intern.security.HasRole;
 import ru.vk.intern.service.UserService;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -22,7 +27,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @HasRole({Role.Name.ROLE_USERS, Role.Name.ROLE_ADMIN})
     public List<User> findUsers() {
         return userService.findAll();
@@ -36,7 +41,25 @@ public class UserController {
 
     @PostMapping("/")
     @HasRole({Role.Name.ROLE_USERS, Role.Name.ROLE_ADMIN})
-    public boolean addUser(@RequestBody User user) {
-        return userService.addUser(user);
+    public ResponseEntity<String> addUser(@RequestBody User user) {
+        User createdUser = userService.addUser(user);
+        if (createdUser == null) {
+            return ResponseEntity.badRequest().body("Username is already in use");
+        }
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/{id}")
+                .buildAndExpand(createdUser.getId()).toUri();
+        return ResponseEntity.created(location).body("User created successfully");
+    }
+
+    @DeleteMapping("/{id}")
+    @HasRole({Role.Name.ROLE_USERS, Role.Name.ROLE_ADMIN})
+    public ResponseEntity<String> delete(@PathVariable("id") long id) {
+        User user = userService.delete(id);
+        if (user == null) {
+            return new ResponseEntity<>("No such user", HttpStatus.NO_CONTENT);
+        }
+
+        return ResponseEntity.ok("User deleted successfully");
     }
 }

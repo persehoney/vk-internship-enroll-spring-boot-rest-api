@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.vk.intern.authorization.AccountCredentials;
-import ru.vk.intern.authorization.validator.AccountCredentialsRegisterValidator;
-import ru.vk.intern.model.Account;
+import ru.vk.intern.authorization.UserCredentials;
+import ru.vk.intern.authorization.validator.UserCredentialsRegisterValidator;
+import ru.vk.intern.model.User;
 import ru.vk.intern.security.Guest;
-import ru.vk.intern.service.AccountService;
+import ru.vk.intern.service.UserService;
 
 import java.net.URI;
 import java.util.stream.Collectors;
@@ -25,22 +25,22 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/register")
 public class RegisterController extends Controller {
-    private final AccountService accountService;
-    private final AccountCredentialsRegisterValidator accountCredentialsRegisterValidator;
+    private final UserService userService;
+    private final UserCredentialsRegisterValidator userCredentialsRegisterValidator;
 
-    public RegisterController(AccountService accountService, AccountCredentialsRegisterValidator AccountCredentialsRegisterValidator) {
-        this.accountService = accountService;
-        this.accountCredentialsRegisterValidator = AccountCredentialsRegisterValidator;
+    public RegisterController(UserService userService, UserCredentialsRegisterValidator UserCredentialsRegisterValidator) {
+        this.userService = userService;
+        this.userCredentialsRegisterValidator = UserCredentialsRegisterValidator;
     }
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
-        binder.addValidators(accountCredentialsRegisterValidator);
+        binder.addValidators(userCredentialsRegisterValidator);
     }
 
     @PostMapping("/")
     @Guest
-    public ResponseEntity<String> register(@RequestBody @Valid AccountCredentials accountCredentials,
+    public ResponseEntity<String> register(@RequestBody @Valid UserCredentials userCredentials,
                                            BindingResult bindingResult,
                                            HttpSession httpSession) {
         if (bindingResult.hasErrors()) {
@@ -49,11 +49,11 @@ public class RegisterController extends Controller {
                     .collect(Collectors.joining(",")), HttpStatus.BAD_REQUEST);
         }
 
-        Account account = accountService.register(accountCredentials);
-        setAccount(httpSession, account);
+        User user = userService.register(userCredentials);
+        setUser(httpSession, user);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/accounts/{id}")
-                .buildAndExpand(account.getId()).toUri();
-        return ResponseEntity.created(location).body("Account registered successfully");
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/{id}")
+                .buildAndExpand(user.getId()).toUri();
+        return ResponseEntity.created(location).body("User registered successfully");
     }
 }

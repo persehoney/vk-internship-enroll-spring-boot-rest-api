@@ -3,21 +3,21 @@ package ru.vk.intern.authorization;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
-public class AccountCredentials {
+public class UserCredentials {
     @NotEmpty
     @Size(min = 2, max = 255)
-    private String login;
+    private String username;
 
     @NotEmpty
     @Size(min = 1, max = 60)
     private String password;
 
-    public String getLogin() {
-        return login;
+    public String getUsername() {
+        return username;
     }
 
-    public void setLogin(String username) {
-        this.login = username;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

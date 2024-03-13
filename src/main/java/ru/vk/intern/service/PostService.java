@@ -26,6 +26,28 @@ public class PostService {
 
     public Post findById(long id) {
         Optional<Post> post = postRepository.findById(id);
-        return post.orElseGet(() -> postHolder.findById(id));
+        if (post.isPresent()) {
+            return post.get();
+        }
+        try {
+            return postHolder.findById(id);
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    public Post addPost(Post post) {
+        postHolder.addPost(post);
+        return postRepository.save(post);
+    }
+
+    public Post delete(long id) {
+        Post post = findById(id);
+        if (post == null) {
+            return null;
+        }
+        postHolder.deletePost(id);
+        postRepository.delete(post);
+        return post;
     }
 }

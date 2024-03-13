@@ -4,8 +4,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
-import ru.vk.intern.model.Account;
-import ru.vk.intern.service.AccountService;
+import ru.vk.intern.model.User;
+import ru.vk.intern.service.UserService;
 
 // todo
 @RestController
@@ -13,23 +13,23 @@ public class Controller {
     private static final String ACCOUNT_ID_SESSION_KEY = "accountId";
 
     @Autowired
-    private AccountService accountService;
+    private UserService userService;
 
-    @ModelAttribute("account")
-    public Account getAccount(HttpSession httpSession) {
-        Object accountId = httpSession.getAttribute(ACCOUNT_ID_SESSION_KEY);
-        return accountId == null ? null : accountService.findById((Long) httpSession.getAttribute(ACCOUNT_ID_SESSION_KEY));
+    @ModelAttribute("user")
+    public User getUser(HttpSession httpSession) {
+        Object userId = httpSession.getAttribute(ACCOUNT_ID_SESSION_KEY);
+        return userId == null ? null : userService.findById((Long) httpSession.getAttribute(ACCOUNT_ID_SESSION_KEY));
     }
 
-    void setAccount(HttpSession httpSession, Account account) {
-        if (account != null) {
-            httpSession.setAttribute(ACCOUNT_ID_SESSION_KEY, account.getId());
+    void setUser(HttpSession httpSession, User user) {
+        if (user != null) {
+            httpSession.setAttribute(ACCOUNT_ID_SESSION_KEY, user.getId());
         } else {
-            unsetAccount(httpSession);
+            unsetUser(httpSession);
         }
     }
 
-    void unsetAccount(HttpSession httpSession) {
+    void unsetUser(HttpSession httpSession) {
         httpSession.removeAttribute(ACCOUNT_ID_SESSION_KEY);
     }
 }

@@ -1,16 +1,20 @@
 package ru.vk.intern.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(
@@ -21,23 +25,29 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotEmpty
     @Size(min = 1, max = 255)
     private String name;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Size(max = 100)
+    private String passwordSha;
 
     @NotEmpty
     @Size(min = 1, max = 255)
     private String username;
 
-    @NotEmpty
     @Size(min = 1, max = 255)
     private String email;
 
-    @NotEmpty
     @Size(min = 1, max = 255)
     private String phone;
 
-    @NotEmpty
     @Size(min = 1, max = 255)
     private String website;
 
@@ -87,5 +97,29 @@ public class User {
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public String getPasswordSha() {
+        return passwordSha;
+    }
+
+    public void setPasswordSha(String passwordSha) {
+        this.passwordSha = passwordSha;
+    }
+
+    public void addRole(Role role) {
+        if (roles == null) {
+            roles = Set.of(role);
+        } else {
+            roles.add(role);
+        }
     }
 }

@@ -19,33 +19,33 @@ class AuthorizationTests extends Tests {
     @Test
     @DisplayName("Successful registration")
     void register() throws Exception {
-        String login = RandomString.make(15);
+        String username = RandomString.make(15);
         String password = RandomString.make(15);
-        String jsonRequest = String.format("{\"login\" :\"%s\", \"password\": \"%s\"}", login, password);
+        String jsonRequest = String.format("{\"username\" :\"%s\", \"password\": \"%s\"}", username, password);
         mockMvc.perform(post(BASE_URL + "/register/")
                         .contentType(APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(status().isCreated())
-                .andExpect(content().string("Account registered successfully"));
+                .andExpect(content().string("User registered successfully"));
     }
 
     @Test
     @DisplayName("Register existing user attempt")
     void testExistingUserRegistrationAttempt() throws Exception {
-        String jsonRequest = "{\"login\":\"admin\",\"password\":\"admin\"}'";
+        String jsonRequest = "{\"username\":\"admin\",\"password\":\"admin\"}'";
 
         mockMvc.perform(post(BASE_URL + "/register/")
                         .contentType(APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Login is in use already"));
+                .andExpect(content().string("Username is in use already"));
     }
 
     @Test
     @DisplayName("Repeated log in attempt")
     void testRepeatedLoginAttempt() throws Exception {
         MockHttpSession session = new MockHttpSession();
-        String jsonRequest = "{\"login\":\"admin\",\"password\":\"admin\"}'";
+        String jsonRequest = "{\"username\":\"admin\",\"password\":\"admin\"}'";
         login(session, jsonRequest);
 
         mockMvc.perform(post(BASE_URL + "/login/")
@@ -60,7 +60,7 @@ class AuthorizationTests extends Tests {
     @DisplayName("No access attempt")
     void testNoAccessAttempt() throws Exception {
         MockHttpSession session = new MockHttpSession();
-        String jsonRequest = "{\"login\":\"roleUser\",\"password\":\"roleUser\"}'";
+        String jsonRequest = "{\"username\":\"roleUser\",\"password\":\"roleUser\"}'";
         login(session, jsonRequest);
 
         mockMvc.perform(get(BASE_URL + "/posts/")
@@ -73,14 +73,14 @@ class AuthorizationTests extends Tests {
     @Test
     @DisplayName("Wrong password")
     void testLoginWrongPassword() throws Exception {
-        String jsonRequest = "{\"login\":\"admin\",\"password\":\"qwerty\"}'";
+        String jsonRequest = "{\"username\":\"admin\",\"password\":\"qwerty\"}'";
         processInvalidCredentials(jsonRequest);
     }
 
     @Test
-    @DisplayName("Non-existent login")
+    @DisplayName("Non-existent username")
     void testLoginNonExistentUsername() throws Exception {
-        String jsonRequest = "{\"login\":\"nonExistentUser2003\",\"password\":\"qwerty\"}'";
+        String jsonRequest = "{\"username\":\"nonExistentUser2003\",\"password\":\"qwerty\"}'";
         processInvalidCredentials(jsonRequest);
     }
 
@@ -89,6 +89,6 @@ class AuthorizationTests extends Tests {
                         .contentType(APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid login or password"));
+                .andExpect(content().string("Invalid username or password"));
     }
 }

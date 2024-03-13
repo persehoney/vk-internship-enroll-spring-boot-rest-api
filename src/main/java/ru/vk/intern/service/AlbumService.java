@@ -26,6 +26,28 @@ public class AlbumService {
 
     public Album findById(long id) {
         Optional<Album> album = albumRepository.findById(id);
-        return album.orElseGet(() -> albumHolder.findById(id));
+        if (album.isPresent()) {
+            return album.get();
+        }
+        try {
+            return albumHolder.findById(id);
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    public Album addAlbum(Album album) {
+        albumHolder.addAlbum(album);
+        return albumRepository.save(album);
+    }
+
+    public Album delete(long id) {
+        Album album = findById(id);
+        if (album == null) {
+            return null;
+        }
+        albumHolder.deleteAlbum(id);
+        albumRepository.delete(album);
+        return album;
     }
 }
